@@ -1,0 +1,39 @@
+<div class="modal" v-bind:class="{ show : isShowSMSPreview }" v-bind:class="{ fade : isShowSMSPreview === false }" role="dialog" v-if="isShowSMSPreview">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" v-on:click="dismissPreview">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    Review SMS
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true" @click="dismissPreview">&times;</button>
+                    <strong>Title!</strong> Alert body ...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" v-bind:class="{ show : isShowEmailPreview }" v-bind:class="{ fade : isShowEmailPreview === false }" role="dialog" v-if="isShowEmailPreview">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" v-on:click="dismissPreview">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    Review SMS
+                </h4>
+            </div>
+            <div class="modal-body">
+                
+            </div>
+        </div>
+    </div>
+</div>

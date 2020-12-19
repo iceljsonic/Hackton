@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ice and File</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.bootcss.com/xlsx/0.11.5/xlsx.core.min.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div id="app">
+
+        <div class="modal" v-bind:class="{ show : isShowMapFieldModalView }" v-bind:class="{ fade : isShowMapFieldModalView === false }" tabindex="-1" role="dialog" v-if="isShowMapFieldModalView" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" v-on:click="backToInitalState">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Please mapping the input fileds
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>Target Field</th>
+                                    <th>Options</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Customer Name</td>
+                                    <td>
+                                        <select name="" id="input" class="form-control" required="required" v-model="mapping.customerName">
+                                            <option disabled value="">Please Select</option>
+                                            <option v-for="option in availableKeysInSelectedRecords" v-bind:value="option">
+                                                {{ option }}
+                                              </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Account Number</td>
+                                    <td>
+                                        <select name="" id="input" class="form-control" required="required" v-model="mapping.accountNumber">
+                                            <option disabled value="">Please Select</option>
+                                            <option v-for="option in availableKeysInSelectedRecords" v-bind:value="option">
+                                                {{ option }}
+                                              </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Email Addres</td>
+                                    <td>
+                                        <select name="" id="input" class="form-control" required="required" v-model="mapping.emailAddress">
+                                            <option disabled value="">Please Select</option>
+                                            <option v-for="option in availableKeysInSelectedRecords" v-bind:value="option">
+                                                {{ option }}
+                                              </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Phone Number</td>
+                                    <td>
+                                        <select name="" id="input" class="form-control" required="required" v-model="mapping.phoneNumber">
+                                            <option disabled value="">Please Select</option>
+                                            <option v-for="option in availableKeysInSelectedRecords" v-bind:value="option">
+                                                {{ option }}
+                                              </option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" v-on:click="makeUpRecordList">
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" v-bind:class="{ show : isShowSMSPreview }" v-bind:class="{ fade : isShowSMSPreview === false }" role="dialog" tabindex="-1" v-if="isShowSMSPreview" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" v-on:click="dismissPreview">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Review SMS
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            Dear {{currentFocusedRecord.customerName}}, this is a notification SMS to inform you that we have sent you a email with address: {{currentFocusedRecord.emailAddress}} !
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal" v-bind:class="{ show : isShowEmailPreview }" v-bind:class="{ fade : isShowEmailPreview === false }" role="dialog" v-if="isShowEmailPreview">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" v-on:click="dismissPreview">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Review Email
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <strong>Dear {{ currentFocusedRecord.customerName }}</strong>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="container" style="width: 80%;">
+            <div >
+                <div class=" panel-default panel-heading" style="width:20%;">
+                    
+                    <img src="https://www.hsbc.com/-/files/hsbc/header/hsbc-logo-200x25.svg?h=25&la=en-GB&hash=471242116AF953D56D8A829C5872F12D624638C8" class="img-responsive" alt="Image">
+                    
+                </div>
+                <div class=" panel-heading panel-success">
+                    <h3 class="panel-title">{{step}}</h3>
+                </div>
+            </div>
+        </div>
+        
+        
+        <br>
+
+        <div class="container" style="width: 80%;">
+            <div  style="width: 90%;" class="pull-right">
+                <div class="input-group" >
+                    <p v-text="fileName" class="form-control text-muted text-nowrap text-right"  style="font: font-weight-light;"></p>
+                    <input id="file" type="file"  style="display:none" v-on:change="uploadedFile" accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" >
+                    <label  for="file" class="input-group-addon">Browerse</label>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="container" style="width: 80%; align-content: center;" >
+            <div v-if="displayTable">
+                <table class="table table-bordered table-hover table-striped panel-primary">
+                    <thead>
+                        <tr>
+                            <th class=" text-center">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" v-model="isSelectedAll">
+                                        Select All
+                                    </label>
+                                </div>
+                            </th>
+                            <th class="panel-title panel-primary btn-success">Index</th>
+                            <th class="panel-title panel-primary btn-success">Customer name</th>
+                            <th class="panel-title panel-primary btn-success">email</th>
+                            <th class="panel-title panel-primary btn-success">Phone number</th>
+                            <th class="panel-title panel-primary btn-success">Account number</th>
+                            <th class="panel-title panel-primary btn-success">Operation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="record in recordList" :key="record.id">
+                            <td align="center">
+    
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" :value="record.id" v-model="selectedRecordsIndexSet">
+                                    </label>
+                                </div>
+    
+                            </td>
+                            <td v-text="record.id + 1" align="center"></td>
+                            <td v-text="record.customerName"></td>
+                            <td v-text="record.emailAddress"></td>
+                            <td v-text="record.phoneNumber"></td>
+                            <td v-text="record.accountNumber"></td>
+                            <td align="center">
+                                <button type="button" class="btn btn-large btn-info" v-on:click="previewEmail(record.id)" >Email</button>
+                                <button type="button" class="btn btn-large btn-info" v-on:click="previewSMS(record.id)" >SMS</button>
+                                
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+
+            <div align="right">
+                <button type="button" class="btn btn-large btn-success align-right" v-on:click="sendMailAndMessage"
+                v-if="displaySubmitButton">{{submitTitle}}</button>
+            </div>
+            
+
+        </div>
+
+        
+
+    </div>
+    
+
+    <div class="panel-default navbar-fixed-bottom">
+        <div class="panel-body form-inline">
+              <span class="label label-info">Copyright:</span>
+              <label class="text-muted">This is a Demo from team</label>
+              <strong>'Ice and File'</strong>
+        </div>
+    </div>
+    
+    
+    
+    
+</body>
+<script src="index.js"></script>
+
+</html>

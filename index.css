@@ -1,0 +1,12 @@
+/* 让模态框显示 */
+.modal {
+    display: block;
+  }
+  
+  /* 如果不使用vue的transition的话可以不设置 */
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .15s;
+  }
+  .fade-enter, .fade-leave-to {
+    opacity: 0.8;
+  }
